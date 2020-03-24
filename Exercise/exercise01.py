@@ -13,6 +13,7 @@
 import random
 import tkinter
 
+
 class RandomBall:
     '''
     定义一个球的类
@@ -87,6 +88,7 @@ class RandomBall:
             self.yvelocity = - self.yvelocity
         self.canvas.move(self.item, self.xvelocity, self.yvelocity)
 
+
 class ScreenSaver:
     '''定义屏保的类,可以被启动'''
     balls = list()
@@ -145,6 +147,7 @@ class ScreenSaver:
     #
     # def stay(self):
     #     self.son_root.withdraw()
+
 
 if __name__ == "__main__":
     # 启动屏保
