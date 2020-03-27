@@ -34,9 +34,16 @@
         - 英雄机
         - 天空
     - 配置文件
-        - 可以通过一次性哦诶只来让程序正确运行
+        - 可以通过一次性配置来让程序正确运行
         - 降低了代码软件工程方面的成本
         - python的配置文件包:configparser
-            - 以前就叫Configparser
+            - 以前就叫ConfigParser
+            - 配置文件一般以cfg或者ini结尾
+            - 语法:
+                - 中括号:表示的是section
+                - 每个section下是键值对
+                - 键值对用等号或者冒号链接
+            - get(section_name, key_name),返回相应的值
+            - getint(section_name, key_name),返回相应的整数值
 - 在oop的基础上创建小飞机、蜜蜂等，相对简单很多
 - 程序可以正常产生飞行物，包括英雄机、子弹、云层
