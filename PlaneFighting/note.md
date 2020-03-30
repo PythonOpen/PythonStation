@@ -47,3 +47,23 @@
             - getint(section_name, key_name),返回相应的整数值
 - 在oop的基础上创建小飞机、蜜蜂等，相对简单很多
 - 程序可以正常产生飞行物，包括英雄机、子弹、云层
+
+1.Find some object
+    - SmallPlane
+    - Bee
+    - BigPlane
+    - Bullet
+    - Hero
+    - Sky
+    - PlaneWar
+2.BaseClass
+    - Img, and some functions
+    - position,fly into screen with position(x, 0-height)
+    - move
+3.SubClass
+    - Bee
+    - SmallPlane
+    - Sky
+    - Bullet
+    - Hero
+
