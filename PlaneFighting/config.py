@@ -21,8 +21,9 @@ life_status_dead = 1  # 死亡
 life_status_reset = 2  # 重置
 
 # 角色生命值
-lives_num_smallEnemy = 1
-lives_num_bigEnemy = 2
+lives_num_Enemy = 1
+# lives_num_smallEnemy = 1
+# lives_num_bigEnemy = 2
 lives_num_hero = 3
 
 # 游戏中部件图像所在路径及各部件图像文件名
@@ -80,15 +81,15 @@ initial_anchor_gameover = tk.CENTER
 initial_anchor_gameover_x = window_boundary_col / 2
 initial_anchor_gameover_y = window_boundary_row / 2
 # 敌军小飞机 - x轴上方开始向下移动，具体从x轴的哪个点开始是随机的
-initial_anchor_smallplane = tk.SE
+initial_anchor_smallplane = tk.SW
 initial_anchor_smallplane_x = rd.randint(0, window_boundary_col-image_smallplane_width)
 initial_anchor_smallplane_y = 0
 # 敌军大飞机 - x轴上方开始向下移动，具体从x轴的哪个点开始是随机的
-initial_anchor_bigplane = tk.SE
+initial_anchor_bigplane = tk.SW
 initial_anchor_bigplane_x = rd.randint(0, window_boundary_col - image_bigplane_width)
 initial_anchor_bigplane_y = 0
 # 敌军小蜜蜂 - x轴上方开始向下移动，具体从x轴的哪个点开始是随机的
-initial_anchor_bee = tk.SE
+initial_anchor_bee = tk.SW
 initial_anchor_bee_x = rd.randint(0, window_boundary_col - image_bee_width)
 initial_anchor_bee_y = 0
 # 己方战机 - 出现在窗口的下三分之一处并水平居中
