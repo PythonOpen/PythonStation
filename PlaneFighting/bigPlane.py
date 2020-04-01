@@ -33,14 +33,16 @@ class BigPlane(actor.Actor):
             self.base_move(self.bg_image_tags, x, y)
         else:
             # Y轴边界之外错误处理
-            self.base_move(self.bg_image_tags, 0, -config.window_boundary_row)
+            self.set_lives_num(1)
+            self.update_life_status()
+            self.errors_happened()
 
     # 获取死亡图片
     def get_dead_images(self):
         img = []
         if self.do_dead_play:
             for i in self.dead_image_index:
-                image_fullname= config.images_path + config.filename_bigplane + str(i) + config.filename_suffix
+                image_fullname = config.images_path + config.filename_bigplane + str(i) + config.filename_suffix
                 image = tk.PhotoImage(file=image_fullname)
                 img.append(image)
             return img

@@ -1,4 +1,4 @@
-from PlaneFighting import actor, sky, bigPlane, smallPlane, honeyBee, heroPlane, bullet, config
+from PlaneFighting import sky, bigPlane, smallPlane, honeyBee, heroPlane, bullet, config
 import time
 import tkinter
 import random as rd
@@ -65,8 +65,8 @@ def create_big_plane(root, canvas, enemy_list):
 def create_small_plane(root, canvas, enemy_list):
     # 小飞机
     # x轴初始值为随机数
-    x = rd.randint(0, config.window_boundary_col - config.image_samllplane_width)
-    small_plane = bigPlane.BigPlane(root, canvas, tkinter.SW, x, 0, "SmallPlane")
+    x = rd.randint(0, config.window_boundary_col - config.image_smallplane_width)
+    small_plane = smallPlane.SmallPlane(root, canvas, tkinter.SW, x, 0, "SmallPlane")
     tmp_canvas_img = canvas.create_image(small_plane.anchor_x,
                                          small_plane.anchor_y,
                                          anchor=small_plane.anchor,
@@ -132,6 +132,14 @@ def create_bullet(root, canvas, mother, tag_id):
     return blt_1
 
 
+# 创建己方战机
+def create_owns(root, canvas):
+    hero = create_hero(root, canvas, config.lives_num_hero)
+    bullet_new = create_bullet(root, canvas, hero, config.current_bullet_num)
+    config.current_bullet_num += 1
+    return [hero, bullet_new]
+
+
 # 创建敌机
 def create_enemys(root, canvas):
     # 敌机列表中插入新敌机
@@ -143,7 +151,7 @@ def create_enemys(root, canvas):
 
 
 # 移动敌机
-def move_enemy(root, canvas, enemy):
+def move_enemy(enemy):
     enemy_list = enemy
     # global ENEMY_DEAD_INDEX
 
@@ -161,3 +169,274 @@ def move_enemy(root, canvas, enemy):
         #                         tags="PlayDeath")
         #     root.update()
         #     ENEMY_DEAD_INDEX += 1
+
+
+# 移动己方战机
+def move_owns(own_list):
+    for item in own_list:
+        if item.state is config.life_status_alive:
+            item.exec_move()
+        else:
+            item.errors_happened()
+
+
+# 碰撞测试
+def check_collision(root, canvas, enemy, own):
+    # 英雄机与敌机的碰撞
+    for item in enemy:
+        if own[0].is_hit_another(item):
+            own[0].update_life_status()
+            own[0].errors_happened()
+
+            item.update_life_status()
+            item.errors_happened()
+            enemy.remove(item)
+
+            # 创建新敌机
+            item_type = item.bg_image_tags
+            if item_type is "Bee":
+                create_honeybee(root, canvas, enemy)
+            elif item_type is "SmallPlane":
+                create_small_plane(root, canvas, enemy)
+            elif item_type is "BigPlane":
+                create_big_plane(root, canvas, enemy)
+            else:
+                print("enemy hits error")
+
+            # 删除画布中己方战机并新建
+            lives = own[0].lives_num
+            if lives == 0:
+                config.hero_aircraft_death = True
+            for i in own:
+                i.del_canvas_image(i.bg_image_tags)
+            new_hero = create_hero(root, canvas, lives)
+            new_bullet = create_bullet(root, canvas, new_hero, config.current_bullet_num)
+            config.current_bullet_num += 1
+            own.clear()
+            own.append(new_hero)
+            own.append(new_bullet)
+
+            return enemy, own
+
+        for blt in own[1:]:
+            if item.is_hit_another(blt):
+                # 播放死亡动画
+                blt.update_life_status()
+                blt.errors_happened()
+                own.remove(blt)
+
+                item.update_life_status()
+                item.errors_happened()
+                if item.lives_num <= 0:
+                    enemy.remove(item)
+                    # 创建新敌机
+                    item_type = item.bg_image_tags
+                    if item_type is "Bee":
+                        config.defeat_bee_nums = +1
+                        create_honeybee(root, canvas, enemy)
+                    elif item_type is "SmallPlane":
+                        config.defeat_small_nums = +1
+                        create_small_plane(root, canvas, enemy)
+                    elif item_type is "BigPlane":
+                        config.defeat_big_nums = +1
+                        create_big_plane(root, canvas, enemy)
+                    else:
+                        print("enemy hits error")
+
+                    return enemy, own
+
+        # 删除越界的敌机
+        if item.state is config.life_status_dead:
+            # 创建新敌机
+            item_type = item.bg_image_tags
+            if item_type is "Bee":
+                create_honeybee(root, canvas, enemy)
+            elif item_type is "SmallPlane":
+                create_small_plane(root, canvas, enemy)
+            elif item_type is "BigPlane":
+                create_big_plane(root, canvas, enemy)
+            else:
+                print("enemy hits error")
+            enemy.remove(item)
+
+            return enemy, own
+
+    return enemy, own
+
+
+# 创建图片
+def create_img(filename):
+    start_image_fullname = config.images_path + filename + config.filename_suffix
+    return tkinter.PhotoImage(file=start_image_fullname)
+
+
+# 暂停游戏
+def continue_game(event, root, canvas):
+    print('continue_game')
+    # 返回游戏界面
+    config.game_flag = 'start'
+    canvas.move("Pause", 0, -config.window_boundary_row)
+    root.update()
+
+
+# 暂停游戏
+def pause_game(event, root, canvas):
+    print('pause_game')
+    # 创建暂停界面
+    config.game_flag = 'pause'
+    canvas.move("Pause", 0, config.window_boundary_row)
+    root.update()
+
+
+# 开始游戏
+def start_game(event, root, canvas):
+    print('start_game')
+
+    # 游戏标志
+    config.game_flag = 'start'
+
+    # 屏蔽开始界面
+    canvas.move("Start", 0, config.window_boundary_row*3/2)
+
+    # 创建天空
+    sky_first, sky_second = create_sky(root, canvas)
+
+    # 创建敌方战机
+    enemy_list = create_enemys(root, canvas)
+
+    # 创建己方战机
+    own_list = create_owns(root, canvas)
+    root.update()
+    # 定时更新数据
+    while config.game_flag == 'start':
+        # 当暂停时空运行
+        # 移动天空
+        # 敌机、己机
+
+        move_sky(canvas, sky_first, sky_second)
+        move_enemy(enemy_list)
+        move_owns(own_list)
+
+        # 每帧创建一个新子弹
+        new_blt = create_bullet(root, canvas, own_list[0], config.current_bullet_num)
+        config.current_bullet_num += 1
+        own_list.append(new_blt)
+
+        # 碰撞测试
+        enemy_list, own_list = \
+            check_collision(root, canvas, enemy_list, own_list)
+
+        # 更新窗口画面
+        root.update()
+
+        # 打印得分
+        # 打印当前成绩
+        mygrade = config.defeat_big_nums * config.score_enemy_bee + \
+            config.defeat_small_nums * config.score_enemy_small + \
+            config.defeat_bee_nums * config.score_enemy_bee
+        if mygrade > config.score_highest:
+            config.break_record_flag = True
+            config.score_highest = mygrade
+
+        canvas.delete("Grade")
+        canvas.create_text((5, 5),
+                           fill='red',
+                           font=('Helvetica', 20, 'bold'),
+                           text="得分:"+str(mygrade),
+                           anchor=tkinter.NW,
+                           tag="Grade")
+        # 打印最高记录
+        canvas.delete("Highest")
+        canvas.create_text((config.window_boundary_col/2, 5),
+                           fill='blue',
+                           font=('Helvetica', 20, 'bold'),
+                           text="最高分:" + str(config.score_highest),
+                           anchor=tkinter.N,
+                           tag="Highest")
+        # 打印生命值
+        canvas.delete("Lives")
+        canvas.create_text((config.window_boundary_col-10, 5),
+                           fill='#000fff000',
+                           font=('Helvetica', 20, 'bold'),
+                           text="生命:" + str(own_list[0].lives_num),
+                           anchor=tkinter.NE,
+                           tag="Lives")
+        root.update()
+        if config.hero_aircraft_death:
+            quit_game('', root, canvas)
+
+        time.sleep(0.0333)
+
+
+# 退出游戏
+def quit_game(event, root, canvas):
+    print('quit_game')
+    config.current_bullet_num = 0
+    config.defeat_big_nums = 0
+    config.defeat_small_nums = 0
+    config.defeat_bee_nums = 0
+    config.own_list = []
+    config.enemy_list = []
+    config.game_flag = 'quit'
+    canvas.delete("all")
+    if config.break_record_flag:
+        canvas.create_text((config.window_boundary_col/2, config.window_boundary_row/2-50),
+                           fill='#000fff000',
+                           font=('Fixdsys', 36, 'bold'),
+                           text="恭喜您！\n最高成绩:"+str(config.score_highest)+"\n打破历史纪录！",
+                           anchor=tkinter.CENTER)
+    else:
+        canvas.create_text((config.window_boundary_col / 2, config.window_boundary_row / 2),
+                           fill='#fff000000',
+                           font=('Fixdsys', 36, 'bold'),
+                           text="挑战失败！\n继续加油哦！",
+                           anchor=tkinter.CENTER)
+
+    root.update()
+    time.sleep(3)
+    quit()
+
+
+def control_game(event, root, canvas):
+    if config.game_flag == "begin":
+        start_game(event, root, canvas)
+    if config.game_flag == "start":
+        pause_game(event, root, canvas)
+    if config.game_flag == "start":
+        continue_game(event, root, canvas)
+
+
+# 程序入口函数
+if __name__ == "__main__":
+    # 创建游戏窗口
+    root_window = tkinter.Tk()
+    root_window.title("Python开源学习(公众号:PythonOpen)")
+    root_window.resizable(width=False, height=False)
+    config.game_flag = "begin"
+
+    # 创建画布
+    window_canvas = tkinter.Canvas(root_window,
+                                   width=config.window_boundary_col,
+                                   height=config.window_boundary_row)
+    # expand为布尔值，1表示父级大小增加则展开小部件，fill=tkinter.BOTH，父级大小增加，则从两边展开
+    window_canvas.pack(expand=tkinter.YES, fill=tkinter.BOTH)
+    # 创建开始界面
+    start_img = create_img(config.filename_start)
+    window_canvas.create_image(config.window_boundary_col / 2,
+                               config.window_boundary_row / 2,
+                               anchor=tkinter.CENTER,
+                               image=start_img,
+                               tags="Start")
+    # 创建暂停界面
+    pause_img = create_img(config.filename_pause)
+    window_canvas.create_image(config.window_boundary_col / 2,
+                               -(config.window_boundary_row / 2),
+                               anchor=tkinter.CENTER,
+                               image=pause_img,
+                               tags="Pause")
+    # 点击界面开始游戏
+    root_window.bind('<Button-1>', lambda event: control_game(event, root_window, window_canvas))
+    root_window.bind('<KeyPress-Escape>', lambda event: quit_game(event, root_window, window_canvas))
+
+    tkinter.mainloop()
+

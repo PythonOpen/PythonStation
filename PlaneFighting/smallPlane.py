@@ -33,7 +33,9 @@ class SmallPlane(actor.Actor):
             self.base_move(self.bg_image_tags, x, y)
         else:
             # Y轴边界之外错误处理
-            self.base_move(self.bg_image_tags, 0, -config.window_boundary_row)
+            self.set_lives_num(1)
+            self.update_life_status()
+            self.errors_happened()
 
     # 获取死亡图片
     def get_dead_images(self):

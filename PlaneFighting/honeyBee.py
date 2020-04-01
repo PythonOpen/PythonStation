@@ -25,11 +25,12 @@ class HoneyBee(actor.Actor):
         self.bg_image = tk.PhotoImage(file=self.bg_image_fullname)
 
     def exec_move(self):
-        if self.nw[0] < config.window_boundary_col\
+        if self.nw[0] < self.steps[0]\
                 or self.ne[0] > config.window_boundary_col - self.steps[0]:
             # 左右碰壁时x轴反向
             x = self.steps[0] * self.move_direction[0]
             y = self.steps[1] * self.move_direction[1]
+            self.base_move(self.bg_image_tags, x, y)
         if self.nw[1] < config.window_boundary_row:
             # Y轴边界之内正常移动
             x = self.steps[0] * self.move_direction[1]
@@ -37,7 +38,9 @@ class HoneyBee(actor.Actor):
             self.base_move(self.bg_image_tags, x, y)
         else:
             # Y轴边界之外错误处理
-            self.base_move(self.bg_image_tags, 0, -config.window_boundary_row)
+            self.set_lives_num(1)
+            self.update_life_status()
+            self.errors_happened()
 
     # 获取死亡图片
     def get_dead_images(self):

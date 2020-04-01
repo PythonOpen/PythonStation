@@ -46,6 +46,7 @@ class Actor(object):
         self.center = self.get_anchor_center_position()
         # 画布上图像下标
         self.canvas_img_index = 0
+        self.ENEMY_DEAD_INDEX = 0
 
     # 获取左上角坐标值
     def get_anchor_nw_position(self):

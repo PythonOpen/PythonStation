@@ -19,12 +19,12 @@ class HeroPlane(actor.Actor):
         # 重置生命值
         self.set_lives_num(lives)
         # 设置点击事件
-        # root.bind('<B1-Motion>', self.follow_mouse)
+        root.bind('<B1-Motion>', self.follow_mouse)
         root.bind('<KeyPress-Left>', self.key_press)
         root.bind('<KeyPress-Up>', self.key_press)
         root.bind('<KeyPress-Down>', self.key_press)
         root.bind('<KeyPress-Right>', self.key_press)
-        # root.bind('<ButtonRelease-1>', self.Release_mouse)
+        root.bind('<ButtonRelease-1>', self.Release_mouse)
 
     def exec_move(self):
         if 0 < self.nw[0] and 0 < self.nw[1] \
@@ -79,26 +79,26 @@ class HeroPlane(actor.Actor):
         #     self.move_direction = [1, 0]
 
     # 己方英雄跟随鼠标移动
-    # def follow_mouse(self, event):
-    #     mouse = [event.x, event.y]
-    #     # print(event, "current_mouse_pos: ", mouse)
-    #     # Y轴移动方向
-    #     if mouse[1] > self.center[1]:
-    #         self.move_direction[1] = 1
-    #     elif mouse[1] < self.center[1]:
-    #         self.move_direction[1] = -1
-    #     else:
-    #         self.move_direction[1] = 0
-    #
-    #     # X轴移动方向
-    #     if mouse[0] > self.center[0]:
-    #         self.move_direction[0] = 1
-    #     elif mouse[0] < self.center[0]:
-    #         self.move_direction[0] = -1
-    #     else:
-    #         self.move_direction[0] = 0
+    def follow_mouse(self, event):
+        mouse = [event.x, event.y]
+        # print(event, "current_mouse_pos: ", mouse)
+        # Y轴移动方向
+        if mouse[1] > self.center[1]:
+            self.move_direction[1] = 1
+        elif mouse[1] < self.center[1]:
+            self.move_direction[1] = -1
+        else:
+            self.move_direction[1] = 0
 
-        # print("item.move_direction ->", item.move_direction)
+        # X轴移动方向
+        if mouse[0] > self.center[0]:
+            self.move_direction[0] = 1
+        elif mouse[0] < self.center[0]:
+            self.move_direction[0] = -1
+        else:
+            self.move_direction[0] = 0
 
-    # def Release_mouse(self, event):
-    #     print("into  Release_mouse: ", event)
+        print("item.move_direction ->", self.move_direction)
+
+    def Release_mouse(self, event):
+        print("into  Release_mouse: ", event)
