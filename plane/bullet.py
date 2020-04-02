@@ -22,6 +22,7 @@ class Bullet1(pygame.sprite.Sprite):
         self.rect.left, self.rect.top = position
         self.active = True
 
+
 class Bullet2(pygame.sprite.Sprite):
     def __init__(self, positon):
         pygame.sprite.Sprite.__init__(self)
